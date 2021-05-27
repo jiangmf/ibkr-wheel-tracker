@@ -6,13 +6,9 @@
     </ng-template>
 </p-menubar>
 
-<p-fileUpload name="demo[]" (onUpload)="onUpload($event)" (uploadHandler)="uploadHandler($event)" [customUpload]='true'
+<p-fileUpload name="demo[]" (uploadHandler)="uploadHandler($event)" [customUpload]='true'
             [multiple]="true" accept="" [maxFileSize]="10000000">
-            <!-- <ng-template pTemplate="content">
-                <ul *ngIf="uploadedFiles.length">
-                    <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
-                </ul>
-            </ng-template> -->
+
             <ng-template let-file pTemplate="file">
                 <div>{{file.name}} - {{file.size}} byte</div>
             </ng-template>
@@ -23,26 +19,33 @@
         <ng-container *ngFor="let account of data | mapToArray">           
         <p-tabPanel [header]="account.key">
             <div *ngFor="let ticker of account.value | mapToArray">
-                <h3>{{ticker.key}}</h3>
-                <p-table [value]="ticker.value.stock_trades | mapToArray" *ngIf="!empty(ticker.value.stock_trades)">
+                <h3>{{ticker.key}} Profit: {{ticker.value.profit }}</h3>
+                <p-table [value]="ticker.value.stock_trades | toStockTable" *ngIf="!empty(ticker.value.stock_trades)" styleClass="p-datatable-striped p-datatable-sm">
                     <ng-template pTemplate="header">
+                        <tr>
+                            <th colspan="4">Buys</th>
+                            <th colspan="4">Sells</th>
+                        </tr>
                     <tr>
+                        
+                        <th *ngFor="let column of stock_columns | mapToArray">
+                            {{ column.value }}
+                        </th>
                         <th *ngFor="let column of stock_columns | mapToArray">
                             {{ column.value }}
                         </th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-stock_trade>
+                <ng-template pTemplate="body" let-row>
                     <tr>
-                    <td *ngFor="let column of stock_columns | mapToArray">
-                        <!-- {{print(stock_trade)}} -->
-                        {{stock_trade.value.summary[column.key]}}
-                    </td>
-                </tr>
+                        <td *ngFor="let column of row">
+                           {{ column }}
+                        </td>
+                    </tr>
                 </ng-template>
                 </p-table>
             
-                <p-table [value]="ticker.value.option_trades | mapToArray" *ngIf="!empty(ticker.value.option_trades)">
+                <p-table [value]="ticker.value.option_trades | toOptionTable" *ngIf="!empty(ticker.value.option_trades)" styleClass="p-datatable-striped p-datatable-sm">
                     <ng-template pTemplate="header">
                     <tr>
                         <th>Symbol</th>
@@ -53,15 +56,17 @@
                             {{ column.value }}
                         </th>
                     </tr></ng-template>
-                    <ng-template pTemplate="body" let-symbol>
+                    <ng-template pTemplate="body" let-subtable>
 
                         <tr>
-                            <td><strong>{{symbol.key}}</strong></td>
-                            <td *ngFor="let column of stock_columns | mapToArray">
-                                <!-- {{print(stock_trade)}} -->
-                                <div *ngFor="let option_trade of symbol.value | mapToArray">
-                                    {{option_trade.value.summary[column.key]}}
-                                </div>
+                            <td [rowSpan]="subtable.rowspan"><strong>{{subtable.header}}</strong></td>
+                                <td *ngFor="let column of subtable.rows[0]">
+                                    {{ column }}
+                                </td>
+                        </tr>
+                        <tr *ngFor="let row of subtable.rows.slice(1)">
+                            <td *ngFor="let column of row">
+                                {{ column }}
                             </td>
                         </tr>
                 </ng-template>

@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import { AppComponent, MapToArray } from './app.component';
+import { AppComponent, MapToArray, toStockTablePipe, toOptionTablePipe } from './app.component';
 
 import {TableModule} from 'primeng/table';
 import {MenubarModule} from 'primeng/menubar';
@@ -16,7 +16,9 @@ import {MessageService} from 'primeng/api';
 @NgModule({
   declarations: [
     AppComponent,
-    MapToArray
+    MapToArray,
+    toStockTablePipe,
+    toOptionTablePipe
   ],
   imports: [
     BrowserModule,
